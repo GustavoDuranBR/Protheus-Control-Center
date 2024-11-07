@@ -1,5 +1,11 @@
 # Protheus Control Center
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Poetry](https://img.shields.io/badge/Poetry-60A5FA?style=for-the-badge&logo=poetry&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
+
+Este programa facilita a instalação e configuração do Protheus, automatizando o download de arquivos essenciais, configuração do `appserver.ini`, e a criação de diretórios necessários.
+
 
 Este programa facilita a instalação e configuração do Protheus, automatizando o download de arquivos essenciais, configuração do `appserver.ini`, e a criação de diretórios necessários.
 
