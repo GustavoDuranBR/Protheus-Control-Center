@@ -6,8 +6,9 @@ import time
 
 # URLs base para download e obtenção de versões
 base_urls = {
-    "AppServer": "https://arte.engpro.totvs.com.br/tec/appserver/{}/windows/64/",
+    "AppServer": "https://arte.engpro.totvs.com.br/tec/appserver/{}/windows/64/latest/",
     "SmartClientWebApp": "https://arte.engpro.totvs.com.br/tec/smartclientwebapp/{}/windows/64/builds/",
+    "Web-Agent": "https://arte.engpro.totvs.com.br/tec/web-agent/windows/64/builds/"
 }
 
 build_mapping = {
@@ -78,17 +79,28 @@ def iniciar_download(options, log_func, build_var):
     build = build_mapping.get(build_var.lower(), build_var).lower()
     for label, info in options.items():
         version = info['version']
-        file_name = "appserver.zip" if label == "AppServer" else "smartclientwebapp.zip"
-        url = f"{info['url']}{version}/{file_name}"
+        # Define o nome do arquivo com base no componente selecionado
+        if label == "AppServer":
+            file_name = "appserver.zip"
+        elif label == "SmartClientWebApp":
+            file_name = "smartclientwebapp.zip"
+        elif label == "Web-Agent":
+            file_name = "web-agent.zip"
+        else:
+            continue  # Caso de erro ou componente não reconhecido
+
+        # Monta a URL para download e o diretório de destino
+        url = f"{info['url'].rstrip('/')}/{version.rstrip('/')}/{file_name}"
         build_dir = f"C:\\TOTVS\\Download\\Download_Protheus\\{build}"
         
+        # Verifica e cria o diretório, se necessário
         if not os.path.exists(build_dir):
             os.makedirs(build_dir)
-        
+
         destino = os.path.join(build_dir, file_name)
         update_log(f"Preparando download de {label} - Versão {version}...\n")
         realizar_download(url, destino, update_log)
-    
+
     update_log("\n==== Todos os downloads foram concluídos ====\n")
 
 def open_additional_options(update_log):
