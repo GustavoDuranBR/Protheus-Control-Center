@@ -1,12 +1,7 @@
 import streamlit as st
-st.set_page_config(
-    page_title="Instalador Protheus",
-    page_icon="TOTS3.SA.ico"
-    )
 from funcoes_web import download_and_extract_protheus, download_base_congelada
 from arquivos_adicionais_web import copiar_appserver_ini, copiar_atualiar_rpo
 from opcoes_adicionais_web import open_additional_options
-
 
 def run_instalador():  
     # Inicializa log_content e progress_content no session_state se não existir

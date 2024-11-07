@@ -1,10 +1,7 @@
 import streamlit as st
 from instalador_protheus_web import run_instalador  # Função que roda o programa Instalador Protheus
 from inicializador_protheus_web import run_inicializador  # Função que roda o programa Inicializador Protheus
-st.set_page_config(
-    page_title="Protheus Control Center",  # Título na aba
-    page_icon="TOTS3.SA.ico",  # Ícone da aba
-)
+
 # Funções para cada programa
 def show_home():
     # Coloca a imagem e o título juntos

@@ -1,12 +1,7 @@
 import streamlit as st
-st.set_page_config(
-    page_title="Inicializador Protheus",
-    page_icon="TOTS3.SA.ico"
-)
 import subprocess
 from atualizar_rpo_web import update_rpo
 from config_web import paths, save_paths, load_paths
-
 
 def run_inicializador():
     # Carregar configurações iniciais
