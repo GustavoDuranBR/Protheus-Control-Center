@@ -14,8 +14,8 @@ def show_home():
     st.write("Escolha uma das aplicações no menu lateral para começar.")
     
     st.markdown("""
-    - [Documentação do Instalador Protheus](https://github.com/usuario/repositorio/docs/instalador_protheus.md)
-    - [Documentação do Inicializador Protheus](https://github.com/usuario/repositorio/docs/inicializador_protheus.md)
+    - [Documentação do Instalador Protheus](https://github.com/GustavoDuranBR/Protheus-Control-Center/blob/master/docs/instalador_protheus.md)
+    - [Documentação do Inicializador Protheus](https://github.com/GustavoDuranBR/Protheus-Control-Center/blob/master/docs/inicializador_protheus.md)
     """)
 
 

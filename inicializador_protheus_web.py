@@ -92,6 +92,14 @@ def run_inicializador():
     st.sidebar.header("Configurações")
     version_options = ["12.1.2210", "12.1.2310", "12.1.2410"]
     selected_version = st.sidebar.selectbox("Selecionar Versão RPO", version_options)
+    # Seção para definir a porta do Protheus Web
+    st.sidebar.subheader("Configuração da Porta")
+    porta = st.sidebar.number_input(
+        "Digite a porta na qual o Protheus web deve operar:",
+        min_value=1,
+        max_value=65535,
+        value=8080,  # Porta padrão para o Protheus web
+    )
     uploaded_appserver_file = st.sidebar.file_uploader("Carregar appserver.ini", type="ini")
     uploaded_rpo_file = st.sidebar.file_uploader("Carregar TTTM120.RPO", type="rpo")
 
@@ -109,6 +117,7 @@ def run_inicializador():
         paths["Versao_RPO"] = selected_version
         paths["Appserver"] = f"C:\\TOTVS\\Protheus_{selected_version}\\bin\\Appserver\\appserver.exe - Atalho.lnk"
         paths["Smartclient"] = f"C:\\TOTVS\\Protheus_{selected_version}\\bin\\SmartClient\\smartclient.exe - Atalho.lnk"
+        paths["Porta_WEBAPP"] = f"{porta}"
 
     st.sidebar.text_input("Caminho para DbAccess", value=paths["Dbaccess"], disabled=True)
     st.sidebar.text_input("Caminho para AppServer", value=paths["Appserver"], disabled=True)
@@ -149,7 +158,7 @@ def run_inicializador():
                 start_dbaccess_and_appserver()
         with col4:
             if st.button("Protheus WEB", key="btn2", use_container_width=True):
-                web_url = "http://localhost:8089"
+                web_url = f"http://localhost:{porta}"
                 try:
                     subprocess.Popen(f'start {web_url}', shell=True)
                     update_log(f"Navegador aberto em {web_url}.\n")
