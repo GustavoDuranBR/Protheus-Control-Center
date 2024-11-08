@@ -123,3 +123,5 @@ Se você deseja contribuir com o projeto ou fazer melhorias, siga as instruçõe
 1. Faça um fork deste repositório.
 2. Crie uma branch para sua contribuição.
 3. Faça as alterações e envie um pull request.
+
+---

@@ -147,3 +147,5 @@ Caso enfrente algum problema, consulte as seguintes orientações:
 - **Licença**: Este projeto está sob a Licença MIT. Para mais detalhes, consulte o arquivo [LICENSE](LICENSE).
 - **Autor**: Desenvolvido por Gustavo Duran.
 - **Suporte e Contato**: Para dúvidas ou ajuda, entre em contato via email: gustavoduran22@gmail.com
+
+---

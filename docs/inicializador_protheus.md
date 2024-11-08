@@ -155,3 +155,5 @@ Este projeto está licenciado sob a **MIT License**. Consulte o arquivo [LICENSE
 ## Contato
 
 Para dúvidas, sugestões ou contribuições, entre em contato com **Gustavo Duran** através do email: [gustavoduran22@gmail.com](mailto:gustavoduran22@gmail.com). 
+
+---
