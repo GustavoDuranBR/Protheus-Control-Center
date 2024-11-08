@@ -14,10 +14,10 @@ def show_home():
     st.write("Escolha uma das aplicações no menu lateral para começar.")
     
     st.markdown("""
-        ### Aplicações disponíveis:
-        - **Instalador Protheus**: Para instalação de componentes.
-        - **Inicializador Protheus**: Para inicialização e controle dos serviços.
+    - [Documentação do Instalador Protheus](https://github.com/usuario/repositorio/docs/instalador_protheus.md)
+    - [Documentação do Inicializador Protheus](https://github.com/usuario/repositorio/docs/inicializador_protheus.md)
     """)
+
 
 # Menu lateral para navegação
 st.sidebar.title("Protheus Control Center")
