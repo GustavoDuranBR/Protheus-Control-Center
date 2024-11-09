@@ -90,28 +90,17 @@ def run_inicializador():
 
     # Sidebar para configurações
     st.sidebar.header("Configurações")
-    version_options = ["12.1.2210", "12.1.2310", "12.1.2410"]
+    version_options = ["Selecione a versão","12.1.2210", "12.1.2310", "12.1.2410"]
     selected_version = st.sidebar.selectbox("Selecionar Versão RPO", version_options)
+    
     # Seção para definir a porta do Protheus Web
     st.sidebar.subheader("Configuração da Porta")
     porta = st.sidebar.number_input(
         "Digite a porta na qual o Protheus web deve operar:",
         min_value=1,
         max_value=65535,
-        value=8080,  # Porta padrão para o Protheus web
+        value=8089,  # Porta padrão para o Protheus web
     )
-    uploaded_appserver_file = st.sidebar.file_uploader("Carregar appserver.ini", type="ini")
-    uploaded_rpo_file = st.sidebar.file_uploader("Carregar TTTM120.RPO", type="rpo")
-
-    if uploaded_appserver_file:
-        with open(f"C:\\TOTVS\\Protheus_{selected_version}\\bin\\Appserver\\{uploaded_appserver_file.name}", "wb") as f:
-            f.write(uploaded_appserver_file.getbuffer())
-        st.sidebar.success(f"Arquivo {uploaded_appserver_file.name} salvo com sucesso!")
-
-    if uploaded_rpo_file:
-        with open(f"C:\\TOTVS\\{selected_version}\\Apo\\{uploaded_rpo_file.name}", "wb") as f:
-            f.write(uploaded_rpo_file.getbuffer())
-        st.sidebar.success(f"Arquivo {uploaded_rpo_file.name} salvo com sucesso!")
 
     if selected_version:
         paths["Versao_RPO"] = selected_version
@@ -126,21 +115,6 @@ def run_inicializador():
     if st.sidebar.button("Salvar Configurações"):
         save_paths(paths)
         st.sidebar.success("Configurações salvas com sucesso!")
-
-    st.markdown("""
-        <style>
-        .button-container button {
-            width: 100%;
-            height: 50px;
-            font-size: 16px;
-        }
-        .title-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        </style>
-    """, unsafe_allow_html=True)
 
     # Informações sobre versão e desenvolvedor
     st.sidebar.markdown("**Dev**: Gustavo Duran  \n**Versão**: 1.0")

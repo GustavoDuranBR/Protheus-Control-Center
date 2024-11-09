@@ -1,6 +1,7 @@
 import streamlit as st
 from instalador_protheus_web import run_instalador  # Função que roda o programa Instalador Protheus
 from inicializador_protheus_web import run_inicializador  # Função que roda o programa Inicializador Protheus
+from configurador_appserver import edit_appserver_config
 
 # Funções para cada programa
 def show_home():
@@ -21,7 +22,7 @@ def show_home():
 
 # Menu lateral para navegação
 st.sidebar.title("Protheus Control Center")
-app_choice = st.sidebar.radio("Escolha a aplicação:", ["Página Inicial", "Instalador Protheus", "Inicializador Protheus"])
+app_choice = st.sidebar.radio("Escolha a aplicação:", ["Página Inicial", "Instalador Protheus", "Inicializador Protheus", "Configurar AppServer.ini"])
 
 # Navegação com base na escolha do usuário
 if app_choice == "Página Inicial":
@@ -30,3 +31,5 @@ elif app_choice == "Instalador Protheus":
     run_instalador()
 elif app_choice == "Inicializador Protheus":
     run_inicializador()
+elif app_choice == "Configurar AppServer.ini":
+    edit_appserver_config()
