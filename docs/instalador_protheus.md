@@ -24,33 +24,22 @@ Este guia detalha como utilizar o instalador, descrevendo suas funcionalidades e
 ### 1. Realizar Download
    - **Descrição**: Automatiza o download dos arquivos necessários para a instalação do Protheus, incluindo AppServer, SmartClient, DBAccess e SmartClientWebApp, conforme a versão, AppServer e build escolhidos.
    - **Uso**: Escolha a versão, AppServer e build desejados, clique em "Realizar Download".
-   - **Código Relevante**:
-     - `get_download_url`: Constrói as URLs de download baseadas na seleção do usuário.
-     - `download_files`: Realiza o download dos arquivos.
 
 ### 2. Baixar AppServer.ini
    - **Descrição**: Baixa e configura o arquivo `appserver.ini` com os parâmetros específicos da versão selecionada.
    - **Uso**: Selecione a versão desejada e clique em "Baixar AppServer.ini" para copiar o arquivo ao diretório correto.
-   - **Código Relevante**:
-     - `copiar_appserver_ini`: Executa a cópia do arquivo `appserver.ini` para o diretório de destino.
 
 ### 3. Baixar Base Congelada
    - **Descrição**: Baixa a base de dados congelada específica para a versão do Protheus escolhida.
    - **Uso**: Clique em "Base Congelada" após selecionar a versão desejada.
-   - **Código Relevante**:
-     - `download_base_congelada`: Baixa o arquivo da base congelada.
 
 ### 4. Criação Automática de Diretórios
    - **Descrição**: Cria automaticamente a estrutura de diretórios necessária para a instalação.
    - **Uso**: Os diretórios são criados automaticamente quando o download é iniciado.
-   - **Código Relevante**:
-     - `create_folder_structure`: Cria a estrutura de diretórios padrão.
 
 ### 5. Atualização do RPO
    - **Descrição**: Copia o script de atualização do RPO para o diretório de destino, permitindo a atualização fácil do ambiente.
    - **Uso**: Clique em "Baixar Atualizador RPO" para copiar o script.
-   - **Código Relevante**:
-     - `copiar_atualiar_rpo`: Realiza a cópia do script de atualização do RPO.
 
 ---
 
