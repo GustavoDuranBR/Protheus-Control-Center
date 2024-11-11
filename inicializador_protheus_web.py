@@ -2,105 +2,59 @@ import streamlit as st
 import subprocess
 from atualizar_rpo_web import update_rpo
 from config_web import paths, save_paths, load_paths
+from log import LogDisplay  # Importa a classe LogDisplay do arquivo log.py
 
 def run_inicializador():
+        # Inicialize o estado de sessão para log e progresso se não existir
+    if 'log_content' not in st.session_state:
+        st.session_state.log_content = []  # Inicializa como uma lista vazia para armazenar logs
+    if 'progress_content' not in st.session_state:
+        st.session_state.progress_content = ''  # Inicializa como uma string vazia para progresso
+
     # Carregar configurações iniciais
     paths = load_paths()
 
-    # Inicializando o log_content se não estiver definido
-    if 'log_content' not in st.session_state:
-        st.session_state.log_content = []
-    if 'progress_content' not in st.session_state:
-        st.session_state.progress_content = ""
-
     # Elementos de exibição de log e botões
     button_display = st.empty()
-    log_display = st.empty()
-
-    def update_log(message, is_progress=False):
-        if is_progress:
-            st.session_state.progress_content = message
-        else:
-            st.session_state.log_content.append(message)
-        display_logs()
-
-    def display_logs():
-        log_content = '\n'.join(st.session_state.log_content)
-        full_log_content = log_content + "\n" + st.session_state.progress_content
-        log_display.markdown(
-            f"""
-            <div style="background-color: black; color: #00FF00; font-family: monospace; padding: 10px; 
-                        border-radius: 5px; height: 350px; width: 700px; overflow-y: auto; margin-top: 20px;">
-                {full_log_content}
-            """,
-            unsafe_allow_html=True
-        )
-
-    def run_command(command):
-        update_log(f"Iniciando: {command}...\n")
-        try:
-            with subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as process:
-                for stdout_line in iter(process.stdout.readline, ""):
-                    if stdout_line:
-                        update_log(stdout_line.strip())
-                process.stdout.close()
-                return_code = process.wait()
-                if return_code:
-                    update_log(f"<span style='color:red;'>Erro: Código de saída {return_code}</span>\n")
-                else:
-                    update_log("Finalizado com sucesso.\n")
-        except Exception as e:
-            update_log(f"<span style='color:red;'>Erro ao executar comando: {e}</span>\n")
 
     def start_dbaccess_and_appserver():
-        run_command(f'start "" "{paths["Dbaccess"]}"')
-        run_command(f'start "" "{paths["Appserver"]}"')
+        log_display.add_log_session("Iniciando DbAccess e AppServer")
+        log_display.run_command(f'start "" "{paths["Dbaccess"]}"')
+        log_display.run_command(f'start "" "{paths["Appserver"]}"')
 
     def start_update_rpo():
         version = paths.get("Versao_RPO", "")
         if not version:
-            update_log("<span style='color:red;'>Erro: Versão RPO não está definida. Verifique nas Configurações.</span>\n")
+            log_display.update_log("Erro: Versão RPO não está definida. Verifique nas Configurações.", message_type="ERRO")
             return
-        update_log("Iniciando atualização do RPO...\n")
-        progress_updates = update_rpo(version, st.session_state.log_content, lambda msg: update_log(msg, is_progress=True)) or []
+        log_display.add_log_session("Atualização do RPO")
+        progress_updates = update_rpo(version, st.session_state.log_content, lambda msg: log_display.update_log(msg, is_progress=True)) or []
         for progress in progress_updates:
-            update_log(progress, is_progress=True)
-        update_log("RPO baixado com sucesso.\n", is_progress=True)
+            log_display.update_log(progress, is_progress=True)
+        log_display.update_log("RPO baixado com sucesso.", message_type="OK")
 
     def close_terminals():
-        update_log("Fechando terminais...\n")
+        log_display.add_log_session("Fechando Terminais")
         dbaccess_close_command = "taskkill /F /IM dbaccess64.exe"
         appserver_close_command = "taskkill /F /IM appserver.exe"
 
         # Fechando o terminal do DbAccess
-        try:
-            run_command(dbaccess_close_command)
-            update_log("<span style='color:green;'>Terminal para DbAccess fechado com sucesso.</span>\n")
-        except Exception as e:
-            update_log(f"<span style='color:red;'>Erro ao fechar DbAccess: {e}</span>\n")
+        log_display.run_command(dbaccess_close_command)
+        log_display.update_log("Terminal para DbAccess fechado com sucesso.", message_type="OK")
 
         # Fechando o terminal do AppServer
-        try:
-            run_command(appserver_close_command)
-            update_log("<span style='color:green;'>Terminal para AppServer fechado com sucesso.</span>\n")
-        except Exception as e:
-            update_log(f"<span style='color:red;'>Erro ao fechar AppServer: {e}</span>\n")
+        log_display.run_command(appserver_close_command)
+        log_display.update_log("Terminal para AppServer fechado com sucesso.", message_type="OK")
 
-        update_log("<span style='color:red;'>Todos os terminais foram fechados.</span>\n")
+        log_display.update_log("Todos os terminais foram fechados.", message_type="ERRO")
 
     # Sidebar para configurações
     st.sidebar.header("Configurações")
-    version_options = ["Selecione a versão","12.1.2210", "12.1.2310", "12.1.2410"]
+    version_options = ["Selecione a versão", "12.1.2210", "12.1.2310", "12.1.2410"]
     selected_version = st.sidebar.selectbox("Selecionar Versão RPO", version_options)
     
-    # Seção para definir a porta do Protheus Web
     st.sidebar.subheader("Configuração da Porta")
-    porta = st.sidebar.number_input(
-        "Digite a porta na qual o Protheus web deve operar:",
-        min_value=1,
-        max_value=65535,
-        value=8089,  # Porta padrão para o Protheus web
-    )
+    porta = st.sidebar.number_input("Digite a porta na qual o Protheus web deve operar:", min_value=1, max_value=65535, value=8089)
 
     if selected_version:
         paths["Versao_RPO"] = selected_version
@@ -127,6 +81,10 @@ def run_inicializador():
             st.markdown("<div class='title-container'><h1>Inicializador Protheus</h1></div>", unsafe_allow_html=True)
 
         col3, col4, col5, col6 = st.columns(4, gap="small")
+        
+        # Cria uma instância de LogDisplay para gerenciar os logs
+        log_display = LogDisplay(log_height=350, log_width=700)
+        
         with col3:
             if st.button("DbAccess/AppServer", key="btn1", use_container_width=True):
                 start_dbaccess_and_appserver()
@@ -135,9 +93,9 @@ def run_inicializador():
                 web_url = f"http://localhost:{porta}"
                 try:
                     subprocess.Popen(f'start {web_url}', shell=True)
-                    update_log(f"Navegador aberto em {web_url}.\n")
+                    log_display.update_log(f"Navegador aberto em {web_url}.", message_type="INFO")
                 except Exception as e:
-                    update_log(f"<span style='color:red;'>Erro ao abrir o navegador: {e}</span>")
+                    log_display.update_log(f"Erro ao abrir o navegador: {e}", message_type="ERRO")
         with col5:
             if st.button("Atualizar RPO", key="btn3", use_container_width=True):
                 start_update_rpo()
@@ -145,4 +103,5 @@ def run_inicializador():
             if st.button("Fechar Terminais", key="btn4", use_container_width=True):
                 close_terminals()
 
-    display_logs()
+    # Exibe o log no final
+    log_display.display_logs()

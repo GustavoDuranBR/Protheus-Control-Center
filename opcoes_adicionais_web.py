@@ -18,7 +18,8 @@ build_mapping = {
 
 def get_versions(url):
     try:
-        response = requests.get(url)
+        # Ignora a verificação SSL para contornar o erro do certificado expirado
+        response = requests.get(url, verify=False)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
         rows = soup.select('tr.file')
@@ -42,7 +43,7 @@ def verificar_e_criar_diretorio():
 
 def realizar_download(url, destino, log_func):
     try:
-        response = requests.get(url, stream=True)
+        response = requests.get(url, stream=True, verify=False)
         response.raise_for_status()
         total_size = int(response.headers.get('content-length', 0))
         downloaded_size = 0
@@ -79,7 +80,6 @@ def iniciar_download(options, log_func, build_var):
     build = build_mapping.get(build_var.lower(), build_var).lower()
     for label, info in options.items():
         version = info['version']
-        # Define o nome do arquivo com base no componente selecionado
         if label == "AppServer":
             file_name = "appserver.zip"
         elif label == "SmartClientWebApp":
@@ -87,13 +87,11 @@ def iniciar_download(options, log_func, build_var):
         elif label == "Web-Agent":
             file_name = "web-agent.zip"
         else:
-            continue  # Caso de erro ou componente não reconhecido
+            continue
 
-        # Monta a URL para download e o diretório de destino
         url = f"{info['url'].rstrip('/')}/{version.rstrip('/')}/{file_name}"
         build_dir = f"C:\\TOTVS\\Download\\Download_Protheus\\{build}"
         
-        # Verifica e cria o diretório, se necessário
         if not os.path.exists(build_dir):
             os.makedirs(build_dir)
 
@@ -112,7 +110,6 @@ def open_additional_options(update_log):
     options = {}
     for label in base_urls.keys():
         if st.sidebar.checkbox(f"Baixar {label}"):
-
             url = base_urls[label].format(build)
             versions = get_versions(url)
             if versions:
@@ -127,10 +124,9 @@ def open_additional_options(update_log):
         iniciar_download(options, update_log, build_var=selected_build)
 
 def display_logs(log_box):
-    log_content = '\n'.join(st.session_state['log_content'])
-    # Define a última mensagem de progresso, mantendo-a na mesma linha
+    log_content = '\n'.join(st.session_state.get('log_content', []))
     progress_content = st.session_state.get('progress_content', "")
-    full_log_content = log_content + "\n" + f"<p style='color:#FFD700;'>{progress_content}</p>"
+    full_log_content = log_content + f"<p style='color:#FFD700;'>{progress_content}</p>"
 
     log_box.markdown(
         f"""
@@ -143,8 +139,7 @@ def display_logs(log_box):
     )
 
 def update_log_display():
-    log_box = st.empty()  # Usando o st.empty() para o log, para atualizar dinamicamente
+    log_box = st.empty()
     while True:
         display_logs(log_box)
-        # Atualiza a tela de logs a cada vez que uma nova entrada é registrada
-        time.sleep(1)  # Pode ajustar o tempo para o que for necessário
+        time.sleep(1)

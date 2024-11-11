@@ -1,71 +1,45 @@
 import streamlit as st
+from log import LogDisplay  # Importa a nova classe de log
 from funcoes_web import download_and_extract_protheus, download_base_congelada
 from arquivos_adicionais_web import copiar_appserver_ini, copiar_atualiar_rpo
 from opcoes_adicionais_web import open_additional_options
 
 def run_instalador():  
-    # Inicializa log_content e progress_content no session_state se não existir
-    if 'log_content' not in st.session_state:
-        st.session_state.log_content = []
-    if 'progress_content' not in st.session_state:
-        st.session_state.progress_content = ""
-
-    # Função para atualizar o log
-    def update_log(message, is_progress=False):
-        if is_progress:
-            st.session_state.progress_content = message
-        else:
-            st.session_state.log_content.append(message)
-        display_logs()
-
-    # Exibe todos os logs no painel de log
-    def display_logs():
-        log_content = '\n'.join(st.session_state.log_content)
-        full_log_content = log_content + "\n" + st.session_state.progress_content
-        log_box.markdown(
-            f"""
-            <div style="background-color: black; color: #00FF00; font-family: monospace; padding: 10px; 
-                        border-radius: 5px; height: 350px; width: 700px; overflow-y: auto; margin-top: 20px;">
-                {full_log_content}
-            """,
-            unsafe_allow_html=True
-        )
-
     # Função para validar as seleções
     def validate_selections(version=None, appserver=None, build=None):
         if version and (not version or version == "Selecione a versão"):
-            update_log("Por favor, selecione a versão do Protheus.")
+            log_display.update_log("Por favor, selecione a versão do Protheus.", message_type="AVISO")
             return False
         if appserver is not None and (not appserver or appserver == "Selecione o AppServer"):
-            update_log("Por favor, selecione o AppServer.")
+            log_display.update_log("Por favor, selecione o AppServer.", message_type="AVISO")
             return False
         if build is not None and (not build or build == "Selecione a Build"):
-            update_log("Por favor, selecione a Build.")
+            log_display.update_log("Por favor, selecione a Build.", message_type="AVISO")
             return False
         return True
 
-    # Função para manipular ações dos botões
+    # Funções de ação dos botões
     def on_download_button_click(version, appserver, build):
         if validate_selections(version, appserver, build):
-            update_log("Espere enquanto realizo o download...")
-            download_and_extract_protheus(version, appserver, build, update_log)
+            log_display.update_log("Espere enquanto realizo o download...", message_type="INFO")
+            download_and_extract_protheus(version, appserver, build, log_display.update_log)
 
     def on_baixar_appserver_ini_button_click(version):
         if validate_selections(version=version):
-            update_log("Copiando o arquivo appserver.ini...")
+            log_display.update_log("Copiando o arquivo appserver.ini...", message_type="INFO")
             copiar_appserver_ini(version)
-            update_log(f"Arquivo appserver.ini copiado para C:\\TOTVS\\Protheus_{version}\\bin\\AppServer\\appserver.ini.")
+            log_display.update_log(f"Arquivo appserver.ini copiado para C:\\TOTVS\\Protheus_{version}\\bin\\AppServer\\appserver.ini.", message_type="OK")
 
     def on_baixar_atualizador_rpo_click(version):
         if validate_selections(version=version):
-            update_log(f"Copiando Atualizar_RPO_{version}.bat...")
+            log_display.update_log(f"Copiando Atualizar_RPO_{version}.bat...", message_type="INFO")
             copiar_atualiar_rpo(version)
-            update_log(f"Arquivo Atualizar_RPO copiado com sucesso para a versão {version}.")
+            log_display.update_log(f"Arquivo Atualizar_RPO copiado com sucesso para a versão {version}.", message_type="OK")
 
     def on_base_congelada_button_click(version):
         if validate_selections(version=version):
-            update_log("Iniciando o download da base congelada...")
-            download_base_congelada(version, update_log)
+            log_display.update_log("Iniciando o download da base congelada...", message_type="INFO")
+            download_base_congelada(version, log_display.update_log)
 
     # Layout da interface
     button_display = st.empty()  # Espaço reservado para os botões
@@ -76,21 +50,16 @@ def run_instalador():
         with col2:
             st.markdown("<div class='title-container'><h1>Instalador Protheus</h1></div>", unsafe_allow_html=True)
 
-    # Seletor de versão
+    # Seletores de versão, AppServer e Build
     version = st.selectbox("Selecione a versão do Protheus:", ["Selecione a versão", "12.1.2210", "12.1.2310", "12.1.2410"], key="version_selectbox")
-
-    # Seletor de AppServer
     appserver = st.selectbox("Selecione o AppServer:", ["Selecione o AppServer", "Harpia", "Panthera Onça"], key="appserver_selectbox")
-
-    # Seletor de Build
     build = st.selectbox("Selecione a Build:", ["Selecione a Build", "Latest", "Next", "Published"], key="build_selectbox")
 
     # Colunas para os botões
     col3, col4, col5, col6 = st.columns(4, gap="small")
-
-    # Placeholder para o painel de log
-    global log_box
-    log_box = st.empty()
+    
+    # Inicializa a exibição de log usando a classe LogDisplay
+    log_display = LogDisplay(log_height=350, log_width=700)
 
     # Botões
     with col3:
@@ -109,9 +78,9 @@ def run_instalador():
         if st.button("Base Congelada", key="btn4", use_container_width=True):
             on_base_congelada_button_click(version)
 
-    # Exibe os logs após os botões
-    display_logs()
+    # Exibe os logs usando a classe LogDisplay
+    log_display.display_logs()
 
     # Informações do desenvolvedor
-    open_additional_options(update_log)
+    open_additional_options(log_display.update_log)
     st.sidebar.markdown(f"**Dev**: Gustavo Duran  \n**Versão**: 1.0")
