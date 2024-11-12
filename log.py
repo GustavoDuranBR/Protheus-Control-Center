@@ -60,13 +60,19 @@ class LogDisplay:
 
     def run_command(self, command):
         """Executa um comando de shell e atualiza o log conforme o output"""
-        self.update_log(f"Iniciando: {command}...\n", message_type="INFO")
+        self.update_log(f"Iniciando: {command}...", message_type="INFO")
         try:
             with subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as process:
                 for stdout_line in iter(process.stdout.readline, ""):
                     if stdout_line:
-                        self.update_log(stdout_line.strip())
+                        # Atualiza o log em tempo real para cada linha de saída
+                        self.update_log(stdout_line.strip(), is_progress=False)
+                    # Verifica e exibe possíveis erros em stderr
+                for stderr_line in iter(process.stderr.readline, ""):
+                    if stderr_line:
+                        self.update_log(stderr_line.strip(), message_type="ERRO", is_progress=False)
                 process.stdout.close()
+                process.stderr.close()
                 return_code = process.wait()
                 if return_code:
                     self.update_log(f"Erro: Código de saída {return_code}", message_type="ERRO")

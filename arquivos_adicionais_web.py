@@ -1,6 +1,5 @@
 import os
 import shutil
-import streamlit as st
 
 def copiar_appserver_ini(version):
     # Diretório de origem com base na versão selecionada

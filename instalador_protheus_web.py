@@ -81,6 +81,6 @@ def run_instalador():
     # Exibe os logs usando a classe LogDisplay
     log_display.display_logs()
 
-    # Informações do desenvolvedor
     open_additional_options(log_display.update_log)
+    # Informações do desenvolvedor
     st.sidebar.markdown(f"**Dev**: Gustavo Duran  \n**Versão**: 1.0")

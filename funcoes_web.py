@@ -1,5 +1,6 @@
 import os
 import zipfile
+import py7zr
 import requests
 import streamlit as st
 from win32com.client import Dispatch
@@ -20,7 +21,7 @@ def create_folder_structure(version, update_log_func):
         os.path.join(BASE_DIRECTORY, f"{version}", "Apo"),
         os.path.join(BASE_DIRECTORY, f"Protheus_{version}", "bin", "Appserver"),
         os.path.join(BASE_DIRECTORY, f"Protheus_{version}", "bin", "SmartClient"),
-        os.path.join(BASE_DIRECTORY, f"{version}", "Protheus_Data"),
+        os.path.join(BASE_DIRECTORY, f"{version}", "Protheus_data"),
         os.path.join(BASE_DIRECTORY, "TotvsDBAccess")
     ]
     for directory in directories:
@@ -29,44 +30,28 @@ def create_folder_structure(version, update_log_func):
     update_log_func("Estrutura de pastas criada com sucesso.")
 
 def get_download_url(appserver, build, version):
-    # URLs base para os arquivos
-    base_url_appserver = "https://arte.engpro.totvs.com.br/tec/appserver/"
-    base_url_smartclient = "https://arte.engpro.totvs.com.br/tec/smartclient/harpia/"
-    base_url_dbaccess = "https://arte.engpro.totvs.com.br/tec/dbaccess/windows/64/latest/dbaccess.zip"
-    base_url_dbapi = "https://arte.engpro.totvs.com.br/tec/dbaccess/windows/64/latest/dbapi.zip"
-    base_url_smartclientwebapp = "https://arte.engpro.totvs.com.br/tec/smartclientwebapp/"
-    base_url_protheus_data = "https://arte.engpro.totvs.com.br/engenharia/base_congelada/protheus/bra/"
-    base_url_web_agent = "https://arte.engpro.totvs.com.br/tec/web-agent/windows/64/latest/"
-
-    # Mapeamento do tipo de appserver
+    # Mapeamento do tipo de appserver e build
     appserver_map = {
         "Harpia": "harpia",
         "Panthera Onça": "panthera_onca"
     }
-
-    # Mapeamento de build
     build_map = {
         "Latest": "latest",
         "Next": "next",
         "Published": "published"
     }
-
-    # Nome do arquivo de smartclientwebapp com base no appserver
-    smartclientwebapp_file = "smartclientwebapp.zip"  # Nome padrão
-
-    # Gerando as URLs para download
+    
     urls = [
-        f"{base_url_appserver}{appserver_map[appserver]}/windows/64/{build_map[build]}/appserver.zip",
-        f"{base_url_smartclient}/windows/64/{build_map[build]}/smartclient.zip",
-        f"{base_url_dbaccess}",
-        f"{base_url_dbapi}",
-        f"{base_url_smartclientwebapp}{appserver_map[appserver]}/windows/64/{build_map[build]}/{smartclientwebapp_file}",
-        f"{base_url_protheus_data}{version}/exp_com_dic/latest/protheus_data.zip",
-        f"{base_url_web_agent}web-agent.zip"
+        f"{URL_BASE_APP_SERVER}{appserver_map[appserver]}/windows/64/{build_map[build]}/appserver.zip",
+        f"{URL_BASE_SMART_CLIENT}/windows/64/{build_map[build]}/smartclient.zip",
+        URL_BASE_DB_ACCESS,
+        URL_BASE_DB_API,
+        f"{URL_BASE_SMART_CLIENT_WEB_APP}{appserver_map[appserver]}/windows/64/{build_map[build]}/smartclientwebapp.zip",
+        f"https://arte.engpro.totvs.com.br/engenharia/base_congelada/protheus/bra/{version}/exp_com_dic/latest/protheus_data.zip",
+        f"https://arte.engpro.totvs.com.br/tec/web-agent/windows/64/latest/web-agent.zip"
     ]
     return urls
 
-# Função para realizar download com progresso
 def download_file_with_progress(file_path, url, update_log_func):
     try:
         response = requests.get(url, stream=True, timeout=60)
@@ -87,28 +72,43 @@ def download_file_with_progress(file_path, url, update_log_func):
     except Exception as e:
         update_log_func(f"Erro inesperado ao baixar {url}: {str(e)}\n")
 
-def extract_files(file_path, extraction_path, update_log_func):
-    # Garante que o diretório de extração existe
-    os.makedirs(extraction_path, exist_ok=True)
+def extract_protheus_data(zip_file_path, extraction_path, update_log_func):
+    """
+    Extrai o arquivo protheus_data.zip para o diretório especificado usando py7zr.
     
-    # Verifica se o arquivo ZIP existe e não está vazio
-    if os.path.exists(file_path):
-        update_log_func(f"Verificando {os.path.basename(file_path)}...")
+    Parâmetros:
+    - zip_file_path: Caminho completo do arquivo ZIP do Protheus.
+    - extraction_path: Caminho do diretório onde os arquivos serão extraídos.
+    - log_func: Função de callback para mensagens de log (opcional).
+    """
+    if update_log_func is None:
+        update_log_func = print  # Define como padrão a função print se nenhuma função de log for passada
 
+    if not os.path.exists(zip_file_path):
+        update_log_func(f"Erro: O arquivo {zip_file_path} não foi encontrado.")
+        return
+
+    if not os.path.exists(extraction_path):
+        os.makedirs(extraction_path, exist_ok=True)
+        update_log_func(f"Pasta de extração criada: {extraction_path}")
+    
+    try:
+        update_log_func(f"Iniciando extração do arquivo {zip_file_path} para {extraction_path}...")
+        with py7zr.SevenZipFile(zip_file_path, 'r') as archive:
+            archive.extractall(path=extraction_path)
+        update_log_func(f"Extração de {zip_file_path} concluída com sucesso em {extraction_path}.")
+    except Exception as e:
+        update_log_func(f"Erro ao extrair {zip_file_path}: {str(e)}")
+
+def extract_files(file_path, extraction_path, update_log_func):
+    os.makedirs(extraction_path, exist_ok=True)
+    if os.path.exists(file_path):
         if os.path.getsize(file_path) > 0:
             try:
                 update_log_func(f"Extraindo {os.path.basename(file_path)} para {extraction_path}...")
-                
-                # Extrai o conteúdo do arquivo ZIP
                 with zipfile.ZipFile(file_path, 'r') as zip_ref:
                     zip_ref.extractall(extraction_path)
-
                 update_log_func(f"Extração de {os.path.basename(file_path)} concluída.\n")
-                
-                # Verifica se o arquivo é web-agent.zip para chamar a instalação específica
-                if os.path.basename(file_path) == "web-agent.zip":
-                    install_web_agent(update_log_func, extraction_path)
-                    
             except zipfile.BadZipFile:
                 update_log_func(f"Erro: {os.path.basename(file_path)} não é um arquivo ZIP válido.\n")
             except Exception as e:
@@ -119,10 +119,7 @@ def extract_files(file_path, extraction_path, update_log_func):
         update_log_func(f"Arquivo {os.path.basename(file_path)} não encontrado para extração.\n")
 
 def download_and_extract_protheus(version, appserver, build, update_log_func):
-    # Cria a estrutura de pastas inicial
     create_folder_structure(version, update_log_func)
-    
-    # Obter URLs de download e definir diretório de destino
     urls = get_download_url(appserver, build, version)
     download_path = os.path.join(BASE_DOWNLOAD_DIRECTORY, version)
     os.makedirs(download_path, exist_ok=True)
@@ -131,29 +128,32 @@ def download_and_extract_protheus(version, appserver, build, update_log_func):
         "appserver.zip": os.path.join(BASE_DIRECTORY, f"Protheus_{version}", "bin", "Appserver"),
         "smartclient.zip": os.path.join(BASE_DIRECTORY, f"Protheus_{version}", "bin", "SmartClient"),
         "dbaccess.zip": os.path.join(BASE_DIRECTORY, "TotvsDBAccess"),
-        "dbapi.zip": os.path.join(BASE_DIRECTORY, f"Protheus_{version}", "bin", "Appserver"),
-        "smartclientwebapp.zip": os.path.join(BASE_DIRECTORY, f"Protheus_{version}", "bin", "SmartClient")
+        "dbapi.zip": os.path.join(BASE_DIRECTORY, "TotvsDBAccess"),
+        "smartclientwebapp.zip": os.path.join(BASE_DIRECTORY, f"Protheus_{version}", "bin", "Appserver"),
+        "protheus_data.zip": os.path.join(BASE_DIRECTORY, f"{version}")
     }
 
     for url in urls:
         file_name = url.split("/")[-1]
         file_path = os.path.join(download_path, file_name)
-        
-        # Download do arquivo com progresso
         update_log_func(f"Iniciando download de {file_name}...")
         download_file_with_progress(file_path, url, update_log_func)
         
-        # Extração do arquivo, se for necessário
         if file_name in extraction_map:
             extraction_path = extraction_map[file_name]
-            extract_files(file_path, extraction_path, update_log_func)
+            
+            # Chamar a função extract_protheus_data para extrair o arquivo de dados do Protheus
+            if file_name == "protheus_data.zip":
+                extract_protheus_data(file_path, extraction_path, update_log_func)  # Chamando a função correta
+            else:
+                # Se for outro arquivo, utilizar a função genérica ou o método de extração desejado
+                extract_files(file_path, extraction_path, update_log_func)
 
-    # Criação de atalhos após todos os downloads e extrações
     create_appserver_shortcut(update_log_func, version)
     create_smartclient_shortcut(update_log_func, version)
     create_dbaccess_shortcut(update_log_func)
     update_log_func("Todos os arquivos foram baixados, extraídos, e os atalhos foram criados com sucesso.\n")
-    
+
 def create_shortcut(file_path, shortcut_name, additional_parameters, update_log_func):
     try:
         pythoncom.CoInitialize()

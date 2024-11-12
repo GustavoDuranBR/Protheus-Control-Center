@@ -1,7 +1,7 @@
 import requests
 import os
 
-def update_rpo(version, log_content, update_log):
+def update_rpo(version, update_log):
     """Atualiza o RPO para a versão especificada."""
     try:
         if version == "12.1.2210":

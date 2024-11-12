@@ -3,6 +3,7 @@ import subprocess
 from atualizar_rpo_web import update_rpo
 from config_web import paths, save_paths, load_paths
 from log import LogDisplay  # Importa a classe LogDisplay do arquivo log.py
+from historical_rpo import download_historical_rpo
 
 def run_inicializador():
         # Inicialize o estado de sessão para log e progresso se não existir
@@ -62,16 +63,13 @@ def run_inicializador():
         paths["Smartclient"] = f"C:\\TOTVS\\Protheus_{selected_version}\\bin\\SmartClient\\smartclient.exe - Atalho.lnk"
         paths["Porta_WEBAPP"] = f"{porta}"
 
-    st.sidebar.text_input("Caminho para DbAccess", value=paths["Dbaccess"], disabled=True)
-    st.sidebar.text_input("Caminho para AppServer", value=paths["Appserver"], disabled=True)
-    st.sidebar.text_input("Caminho para SmartClient", value=paths["Smartclient"], disabled=True)
+    #st.sidebar.text_input("Caminho para DbAccess", value=paths["Dbaccess"], disabled=True)
+    #st.sidebar.text_input("Caminho para AppServer", value=paths["Appserver"], disabled=True)
+    #st.sidebar.text_input("Caminho para SmartClient", value=paths["Smartclient"], disabled=True)
 
     if st.sidebar.button("Salvar Configurações"):
         save_paths(paths)
         st.sidebar.success("Configurações salvas com sucesso!")
-
-    # Informações sobre versão e desenvolvedor
-    st.sidebar.markdown("**Dev**: Gustavo Duran  \n**Versão**: 1.0")
 
     with button_display.container():
         col1, col2 = st.columns([1, 10])
@@ -103,5 +101,8 @@ def run_inicializador():
             if st.button("Fechar Terminais", key="btn4", use_container_width=True):
                 close_terminals()
 
-    # Exibe o log no final
-    log_display.display_logs()
+        # Exibe o log no final
+        log_display.display_logs()
+
+        download_historical_rpo(log_display.update_log)
+        st.sidebar.markdown(f"**Dev**: Gustavo Duran  \n**Versão**: 1.0")

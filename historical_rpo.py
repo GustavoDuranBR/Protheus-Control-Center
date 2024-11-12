@@ -5,17 +5,19 @@ import os
 import time
 from log import LogDisplay
 
-# URLs base para download e obtenção de versões
-base_urls = {
-    "AppServer": "https://arte.engpro.totvs.com.br/tec/appserver/{}/windows/64/builds/",
-    "SmartClientWebApp": "https://arte.engpro.totvs.com.br/tec/smartclientwebapp/{}/windows/64/builds/",
-    "Web-Agent": "https://arte.engpro.totvs.com.br/tec/web-agent/windows/64/builds/"
-}
-
 build_mapping = {
     "Panthera Onça": "panthera_onca",
     "Harpia": "harpia"
 }
+
+version_mapping = {
+    "12.1.2210": "12.1.2210",
+    "12.1.2310": "12.1.2310",
+    "12.1.2410": "12.1.2410"
+}
+
+# URLs base para download e obtenção de versões
+base_url = "https://arte.engpro.totvs.com.br/protheus/padrao/builds/{version_mapping}/historical/repositorio/{build_mapping}/"
 
 log_display = LogDisplay()  # Inicializa o log para o sistema
 
@@ -83,17 +85,9 @@ def iniciar_download(options, log_func, build_var):
     build = build_mapping.get(build_var.lower(), build_var).lower()
     for label, info in options.items():
         version = info['version']
-        if label == "AppServer":
-            file_name = "appserver.zip"
-        elif label == "SmartClientWebApp":
-            file_name = "smartclientwebapp.zip"
-        elif label == "Web-Agent":
-            file_name = "web-agent.zip"
-        else:
-            continue
-
-        url = f"{info['url'].rstrip('/')}/{version.rstrip('/')}/{file_name}"
-        build_dir = f"C:\\TOTVS\\Download\\Download_Protheus\\{build}"
+        file_name = f"{version}.RPO"  # Definindo o nome do arquivo
+        url = f"{info['url'].rstrip('/')}/{version}"  # Removendo a parte do nome do arquivo para obter a URL correta
+        build_dir = f"C:\\TOTVS\\Download\\Download_Protheus\\{build}\\rpo_historical"
         
         if not os.path.exists(build_dir):
             os.makedirs(build_dir)
@@ -104,16 +98,19 @@ def iniciar_download(options, log_func, build_var):
 
     update_log("\n==== Todos os downloads foram concluídos ====\n")
 
-def open_additional_options(update_log):
-    st.sidebar.title("Opções Adicionais de Download")
+def download_historical_rpo(update_log):
+    st.sidebar.subheader("Baixar histórico de RPO")
 
     selected_build = st.sidebar.selectbox("Selecione a Build:", list(build_mapping.keys()))
     build = build_mapping[selected_build]
 
+    selected_version = st.sidebar.selectbox("Selecione a Versão:", list(version_mapping.keys()))
+    version = version_mapping[selected_version]
+
     options = {}
-    for label in base_urls.keys():
-        if st.sidebar.checkbox(f"Baixar {label}"):
-            url = base_urls[label].format(build)
+    for label in ["rpo_historical"]:
+        if st.sidebar.checkbox(f"Baixar {label.capitalize()}"):
+            url = base_url.format(version_mapping=version, build_mapping=build)
             versions = get_versions(url)
             if versions:
                 options[label] = {
@@ -131,3 +128,6 @@ def update_log_display():
     while True:
         log_display(log_box)
         time.sleep(1)
+
+
+
