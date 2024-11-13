@@ -72,11 +72,21 @@ def run_inicializador():
         st.sidebar.success("Configurações salvas com sucesso!")
 
     with button_display.container():
+        # Cria uma seção de colunas para logo e título
         col1, col2 = st.columns([1, 10])
+
+        # Alinhamento centralizado na coluna 1 (logo)
         with col1:
+            st.write(" ")
             st.image("TOTS3.SA.ico", width=70)
+
+        # Alinhamento centralizado na coluna 2 (título)
         with col2:
-            st.markdown("<div class='title-container'><h1>Inicializador Protheus</h1></div>", unsafe_allow_html=True)
+            st.write(" ")
+            st.markdown(
+                "<h1 style='text-align: justify; line-height: 0.3;'>Inicializador Protheus</h1>",
+                unsafe_allow_html=True
+            )
 
         col3, col4, col5, col6 = st.columns(4, gap="small")
         

@@ -5,12 +5,21 @@ from configurador_appserver import edit_appserver_config
 
 # Funções para cada programa
 def show_home():
-    # Coloca a imagem e o título juntos
-    col1, col2 = st.columns([1, 10])  # Define duas colunas para a imagem e o título
+    # Cria uma seção de colunas para logo e título
+    col1, col2 = st.columns([1, 10])
+
+    # Alinhamento centralizado na coluna 1 (logo)
     with col1:
-        st.image("TOTS3.SA.ico", width=70)  # Exibe a imagem
+        st.write(" ")
+        st.image("TOTS3.SA.ico", width=70)
+
+    # Alinhamento centralizado na coluna 2 (título)
     with col2:
-        st.title("Protheus Control Center")  # Exibe o título ao lado da imagem
+        st.write(" ")
+        st.markdown(
+            "<h1 style='text-align: justify; line-height: 0.3;'>Protheus Control Center</h1>",
+            unsafe_allow_html=True
+        )
     
     st.write("Escolha uma das aplicações no menu lateral para começar.")
     

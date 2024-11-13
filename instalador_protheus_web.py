@@ -44,11 +44,21 @@ def run_instalador():
     # Layout da interface
     button_display = st.empty()  # Espaço reservado para os botões
     with button_display.container():
+        # Cria uma seção de colunas para logo e título
         col1, col2 = st.columns([1, 10])
+
+        # Alinhamento centralizado na coluna 1 (logo)
         with col1:
+            st.write(" ")
             st.image("TOTS3.SA.ico", width=70)
+
+        # Alinhamento centralizado na coluna 2 (título)
         with col2:
-            st.markdown("<div class='title-container'><h1>Instalador Protheus</h1></div>", unsafe_allow_html=True)
+            st.write(" ")
+            st.markdown(
+                "<h1 style='text-align: justify; line-height: 0.3;'>Instalador Protheus</h1>",
+                unsafe_allow_html=True
+            )
 
     # Seletores de versão, AppServer e Build
     version = st.selectbox("Selecione a versão do Protheus:", ["Selecione a versão", "12.1.2210", "12.1.2310", "12.1.2410"], key="version_selectbox")

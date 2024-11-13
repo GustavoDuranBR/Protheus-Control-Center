@@ -38,12 +38,21 @@ def save_config(config, file_path):
 
 # Função que cria a interface para editar o arquivo appserver.ini
 def edit_appserver_config():
-    # Coloca a imagem e o título juntos
-    col1, col2 = st.columns([1, 10])  # Define duas colunas para a imagem e o título
+    # Cria uma seção de colunas para logo e título
+    col1, col2 = st.columns([1, 10])
+
+    # Alinhamento centralizado na coluna 1 (logo)
     with col1:
-        st.image("TOTS3.SA.ico", width=70)  # Exibe a imagem
+        st.write(" ")
+        st.image("TOTS3.SA.ico", width=70)
+
+    # Alinhamento centralizado na coluna 2 (título)
     with col2:
-        st.title("Configurações do Appserver")  # Exibe o título ao lado da imagem
+        st.write(" ")
+        st.markdown(
+            "<h1 style='text-align: justify; line-height: 0.3;'>Configurações do Appserver</h1>",
+            unsafe_allow_html=True
+        )
 
     # Sidebar para configurações
     st.sidebar.header("Configurações")
