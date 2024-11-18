@@ -29,10 +29,11 @@ def run_inicializador():
             log_display.update_log("Erro: Versão RPO não está definida. Verifique nas Configurações.", message_type="ERRO")
             return
         log_display.add_log_session("Atualização do RPO")
-        progress_updates = update_rpo(version, st.session_state.log_content, lambda msg: log_display.update_log(msg, is_progress=True)) or []
-        for progress in progress_updates:
+        
+        for progress in update_rpo(version, lambda msg: log_display.update_log(msg, is_progress=True)):
             log_display.update_log(progress, is_progress=True)
-        log_display.update_log("RPO baixado com sucesso.", message_type="OK")
+        
+        log_display.update_log("RPO atualizado com sucesso.", message_type="OK")
 
     def close_terminals():
         log_display.add_log_session("Fechando Terminais")
